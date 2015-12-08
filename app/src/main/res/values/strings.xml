@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">RogerVoiceSP</string>
     <string name="action_settings">Settings</string>
+    <string name="local_service_started">12</string>
+    <string name="local_service_stopped">Service Stopped</string>
+    <string name="local_service_label">Service enabled</string>
 </resources>
