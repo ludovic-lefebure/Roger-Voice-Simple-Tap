@@ -25,7 +25,6 @@ public class IncomingCallReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d("Call", "Entered onReceive");
         mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // context.startService(new Intent());
         showNotification(context);
     }
 
