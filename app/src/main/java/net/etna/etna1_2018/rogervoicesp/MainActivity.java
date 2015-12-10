@@ -2,16 +2,11 @@ package net.etna.etna1_2018.rogervoicesp;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
@@ -55,11 +50,13 @@ public class MainActivity extends Activity {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
                 Log.d("Permissions", "granted");
 
             } else {
 
                 Log.d("Permissions", "denied");
+
             }
         }
     }

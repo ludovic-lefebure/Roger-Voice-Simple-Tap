@@ -20,12 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CallActivity">
+        </activity>
         <receiver android:enabled="true" android:name=".IncomingCallReceiver">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_PHONE_STATE_CHANGED" />
+                <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
     </application>

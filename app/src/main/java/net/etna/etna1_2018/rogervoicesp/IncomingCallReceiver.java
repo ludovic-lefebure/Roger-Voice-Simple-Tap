@@ -8,7 +8,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by lefebure on 08/12/2015.
@@ -23,14 +25,44 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("Call", "Entered onReceive");
-        mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        showNotification(context);
+
+        Log.d("Call", "Broadcasted");
+        String message = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+        if (message != null)
+            Log.d("Options", message);
+        if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
+            Intent i = new Intent(context, CallActivity.class);
+            i.putExtras(intent);
+            i.putExtra("Close", false);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            context.startActivity(i);
+        } else {
+            String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+
+            if(stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)){
+                Intent i = new Intent(context, CallActivity.class);
+                i.putExtra("Close", true);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                context.startActivity(i);
+            } else if(stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK) || stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)){
+                Intent i = new Intent(context, CallActivity.class);
+                i.putExtras(intent);
+                i.putExtra("Close", false);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                context.startActivity(i);
+            }
+        }
+
+        //mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+       // showNotification(context);
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void showNotification(Context context) {
-        // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = context.getText(R.string.local_service_started);
 
         // The PendingIntent to launch our activity if the user selects this notification
@@ -49,6 +81,11 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);
+    }
+
+    public void displayCallDetected(Context context) {
+        Toast t = Toast.makeText(context, "Open the call with Roger Voice", Toast.LENGTH_LONG);
+        t.show();
     }
 
 }
