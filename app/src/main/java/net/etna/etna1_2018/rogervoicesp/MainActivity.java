@@ -11,6 +11,7 @@ import android.util.Log;
 public class MainActivity extends Activity {
 
     private final int PERMISSIONS_PROCESS_OUTGOING_CALLS = 1;
+    private final int PERMISSIONS_SYSTEM_ALERT_WINDOW = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,9 @@ public class MainActivity extends Activity {
         checkPermissions();
     }
 
+    /**
+     * Check if the user has granted the permission to detect outgoing calls
+     */
     public void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.PROCESS_OUTGOING_CALLS)
@@ -27,20 +31,9 @@ public class MainActivity extends Activity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.PROCESS_OUTGOING_CALLS},
                     PERMISSIONS_PROCESS_OUTGOING_CALLS);
-            /*
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.PROCESS_OUTGOING_CALLS)) {
 
-                Log.d("Permissions", "explained");
-
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.PROCESS_OUTGOING_CALLS},
-                        PERMISSIONS_PROCESS_OUTGOING_CALLS);
-                Log.d("Permissions", "requested");
-            }*/
         }
+
     }
 
     @Override
@@ -50,13 +43,9 @@ public class MainActivity extends Activity {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                 Log.d("Permissions", "granted");
-
             } else {
-
                 Log.d("Permissions", "denied");
-
             }
         }
     }

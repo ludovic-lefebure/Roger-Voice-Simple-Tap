@@ -8,8 +8,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -19,63 +19,44 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
     private NotificationManager mNM;
 
-    // Unique Identification Number for the Notification.
-    // We use it on Notification start, and to cancel it.
+    // Unique Identification Number for the Notification
     private int NOTIFICATION = R.string.local_service_started;
+
+    private Context context;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("Call", "Broadcasted");
-        String message = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-        if (message != null)
-            Log.d("Options", message);
+        this.context = context;
+        this.mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
         if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
-            Intent i = new Intent(context, CallActivity.class);
-            i.putExtras(intent);
-            i.putExtra("Close", false);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            context.startActivity(i);
+            showNotification();
         } else {
             String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-
             if(stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)){
-                Intent i = new Intent(context, CallActivity.class);
-                i.putExtra("Close", true);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                context.startActivity(i);
+                mNM.cancel(NOTIFICATION);
+                createCallActivity(true);
             } else if(stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK) || stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)){
-                Intent i = new Intent(context, CallActivity.class);
-                i.putExtras(intent);
-                i.putExtra("Close", false);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                context.startActivity(i);
+                showNotification();
             }
         }
-
-        //mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-       // showNotification(context);
 
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void showNotification(Context context) {
-        CharSequence text = context.getText(R.string.local_service_started);
+    private void showNotification() {
 
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, MainActivity.class), 0);
+                new Intent(context, CallActivity.class), 0);
 
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
-                .setTicker(text)  // the status text
+                .setTicker(NOTIFICATION + "")  // the status text
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(context.getText(R.string.local_service_label))  // the label of the entry
-                .setContentText(text)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .build();
 
@@ -83,9 +64,21 @@ public class IncomingCallReceiver extends BroadcastReceiver {
         mNM.notify(NOTIFICATION, notification);
     }
 
-    public void displayCallDetected(Context context) {
-        Toast t = Toast.makeText(context, "Open the call with Roger Voice", Toast.LENGTH_LONG);
-        t.show();
+    public void createCallActivity(final boolean toClose) {
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                Intent i = new Intent(context, CallActivity.class);
+                i.putExtra("Close", toClose);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                context.startActivity(i);
+            }
+
+        }, 2000);
+
     }
 
 }
